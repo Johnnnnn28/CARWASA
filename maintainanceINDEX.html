@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARWASA - Maintenance & Repair Services</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --color-primary: #135ddc;
+            --color-secondary: #45cade;
+            --color-dark-blue: #021e55;
+            --color-darker-blue: #08245c;
+            --color-white: #ffffff;
+            --color-footer-bg: #08245c;
+            --color-bg: #dbeaf0;
+            --font-main: 'Poppins', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+        
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-main); background: var(--color-bg); color: var(--color-dark-blue); overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        h1, h2, h3, h4 { font-family: var(--font-heading); }
+
+        /* HEADER */
+        .site-header {
+            padding: 20px 40px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .site-header.scrolled {
+            background: rgba(219, 234, 240, 0.95);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 40px;
+        }
+        
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 8px 20px 8px 30px;
+            height: 68px;
+            max-width: 1300px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+        
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-img { width: 42px; height: 58px; object-fit: contain; }
+        .logo-text { font-weight: 800; font-size: 22px; color: var(--color-dark-blue); }
+
+        /* NAVIGATION */
+        .main-nav ul {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        .main-nav a {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            transition: color 0.3s;
+        }
+        .main-nav a:hover,
+        .main-nav .active { color: var(--color-primary); font-weight: 700; }
+
+        /* LOG IN / SIGN UP BUTTON - REPLACES HAMBURGER ON DESKTOP */
+        .login-btn {
+            background: var(--color-primary);
+            color: white !important;
+            font-weight: 700;
+            font-size: 16px;
+            padding: 12px 28px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(19,93,220,0.3);
+        }
+        .login-btn:hover {
+            background: #0d4bb8;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(19,93,220,0.4);
+        }
+
+        /* HAMBURGER (only visible on mobile) */
+        .burger-menu {
+            display: none;
+            cursor: pointer;
+            width: 32px;
+            height: 24px;
+            position: relative;
+        }
+        .burger-menu span {
+            background: var(--color-dark-blue);
+            height: 3.5px;
+            width: 100%;
+            border-radius: 3px;
+            position: absolute;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+        .burger-menu span:nth-child(1) { top: 0; }
+        .burger-menu span:nth-child(2) { top: 10px; }
+        .burger-menu span:nth-child(3) { top: 20px; }
+
+        /* MOBILE MENU */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 380px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.25);
+            transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 999;
+            padding-top: 100px;
+            overflow-y: auto;
+        }
+        .mobile-menu.active { right: 0; }
+        .mobile-menu-header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: 25px 30px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close-menu { font-size: 38px; font-weight: 300; cursor: pointer; color: var(--color-dark-blue); }
+        .mobile-nav-links { padding: 30px; }
+        .mobile-nav-links a {
+            display: block;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            margin-bottom: 28px;
+        }
+        .mobile-nav-links a:hover { color: var(--color-primary); }
+
+        /* HERO SECTION */
+        .page-hero {
+            position: relative;
+            min-height: 350px;
+            background: linear-gradient(180deg, var(--color-dark-blue) 0%, #00329e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding-top: 150px;
+        }
+        .page-hero h1 {
+            font-family: var(--font-heading);
+            font-size: 85px;
+            font-weight: 900;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .wave-bottom {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            z-index: 10;
+        }
+        .wave-bottom svg { width: 100%; height: 130%; display: block; }
+        .wave-path { fill: var(--color-bg); }
+
+        .content-wrap { margin-top: -50px; padding: 40px 20px; position: relative; z-index: 5; }
+
+        /* CONTENT STYLES */
+        .page-section {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-dark-blue);
+            margin-bottom: 25px;
+        }
+        .section-intro { font-size: 16px; line-height: 1.6; color: #555; margin-bottom: 25px; }
+
+        .overview-list li {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .overview-list li::before {
+            content: '•';
+            color: var(--color-primary);
+            font-size: 20px;
+            position: absolute;
+            left: 0;
+        }
+
+        .emergency-box {
+            background: #ffe6e6;
+            border-left: 5px solid #ff4d4d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .emergency-box p { font-size: 16px; line-height: 1.6; color: #b30000; margin-bottom: 10px; }
+        .emergency-box strong { color: #800000; }
+
+        .maintenance-card {
+            background: #f0f8ff;
+            border: 1px solid #cceeff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .maintenance-card p { font-size: 15px; color: #333; margin-bottom: 8px; line-height: 1.5; }
+        .maintenance-card strong { color: var(--color-dark-blue); }
+        .maintenance-card .note { font-weight: 600; color: var(--color-primary); }
+
+        /* FORM */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 16px; font-weight: 600; color: var(--color-dark-blue); margin-bottom: 8px; }
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(19,93,220,0.2);
+            outline: none;
+        }
+        .upload-box { display: flex; align-items: center; gap: 15px; margin-top: 10px; }
+        .upload-button {
+            background: var(--color-secondary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-button:hover { background: #36b0c2; }
+        input[type="file"] { display: none; }
+        .file-name { font-size: 15px; color: #666; font-style: italic; }
+
+        .submit-button {
+            background: var(--color-primary);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 250px;
+            margin: 20px auto 0;
+            display: block;
+        }
+        .submit-button:hover {
+            background: #0d4bae;
+            transform: translateY(-2px);
+        }
+
+        .reporting-tips {
+            background: #e6f7ff;
+            border-left: 5px solid var(--color-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+        .reporting-tips h4 {
+            font-size: 20px;
+            color: var(--color-dark-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .reporting-tips li {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .reporting-tips li::before {
+            content: 'Checkmark';
+            color: var(--color-secondary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* FOOTER */
+        .site-footer-main { background: var(--color-footer-bg); color: white; padding: 70px 40px 20px; }
+        .footer-container { max-width: 1300px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1.3fr; gap: 40px; margin-bottom: 50px; }
+        .footer-title {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            position: relative;
+            text-transform: uppercase;
+        }
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 40px; height: 3px;
+            background: var(--color-secondary);
+        }
+        .footer-brand-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .footer-logo-img { width: 55px; height: 55px; border-radius: 50%; background: white; padding: 5px; object-fit: contain; border: 2px solid var(--color-secondary); }
+        .footer-brand-name { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+        .footer-desc { line-height: 1.6; color: #dbe4ef; margin-bottom: 25px 0; }
+        .social-links { display: flex; gap: 15px; }
+        .social-icon {
+            width: 35px; height: 35px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .social-icon:hover { background: var(--color-secondary); color: var(--color-footer-bg); }
+        .footer-links a { color: #dbe4ef; transition: 0.2s; }
+        .footer-links a:hover { color: var(--color-secondary); padding-left: 5px; }
+        .contact-list li { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 18px; color: #dbe4ef; }
+        }
+        .contact-icon { color: var(--color-secondary); width: 20px; flex-shrink: 0; margin-top: 2px; }
+        .footer-copyright { text-align: center; font-size: 14px; padding-top: 25px; border-top: 1px solid rgba(69,202,222,0.3); color: #dbe4ef; }
+
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .main-nav ul { display: none; }
+            .burger-menu { display: block; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .site-header { padding: 10px 20px; }
+            .header-container { padding: 8px 15px 8px 25px; }
+            .page-hero h1 { font-size: 48px; letter-spacing: 3px; }
+            .page-section { padding: 30px 20px; margin: 30px auto; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .login-btn { padding: 10px 20px; font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR: Log in / Sign up button instead of hamburger on desktop -->
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="CARWASA" class="logo-img" onerror="this.style.display='none'">
+                <span class="logo-text">CARWASA</span>
+            </a>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="login.html" class="login-btn">Log in / Sign up</a></li>
+                </ul>
+            </nav>
+
+            <!-- Hamburger only appears on mobile -->
+            <div class="burger-menu" id="burgerMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="logo-text">CARWASA</div>
+            <div class="close-menu" id="closeMenu">×</div>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="services.html">Services</a>
+            <a href="about.html">About</a>
+            <a href="login.html">Log in / Sign up</a>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="page-hero">
+        <h1>MAINTENANCE AND REPAIR</h1>
+        <div class="wave-bottom">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 150" preserveAspectRatio="none">
+                <path class="wave-path" d="M0,70 C240,110 480,100 720,70 C960,40 1200,40 1440,70 L1440,150 L0,150 Z"></path>
+            </svg>
+        </div>
+    </section>
+
+    <div class="content-wrap">
+
+        <section class="page-section">
+            <h2 class="section-title">Repair Services Overview</h2>
+            <p class="section-intro">
+                CARWASA is committed to providing continuous and safe water supply. Our maintenance team handles pipe repairs, leak detection, pump services, and other related issues to minimize service interruptions.
+            </p>
+            <ul class="overview-list">
+                <li>Pipe leak detection and repair</li>
+                <li>Pump and motor maintenance</li>
+                <li>Emergency response for sudden breakdowns</li>
+                <li>Scheduled maintenance for system efficiency</li>
+            </ul>
+        </section>
+
+        <section class="page-section">
+            <h2 class="section-title">Emergency Repairs</h2>
+            <p class="section-intro">
+                Unexpected water supply issues may happen due to accidents, pipe bursts, or equipment breakdowns. Our emergency team is ready to respond quickly.
+            </p>
+            <div class="emergency-box">
+                <p><strong>Warning:</strong> In case of urgent concerns, call our 24/7 hotline: <a href="tel:09170001234">0917-000-1234</a></p>
+            </div>
+        </section>
+
+        <section class="page-section">
+            <h2 class="section-title">Scheduled Maintenance Notices</h2>
+            <p class="section-intro">
+                To improve water service, scheduled maintenance is carried out from time to time. Advance notices will be posted to inform all affected residents.
+            </p>
+
+            <div class="maintenance-card">
+                <p><strong>Date:</strong> Oct 5, 2025</p>
+                <p><strong>Location:</strong> Sitio Mabuhay, Casay</p>
+                <p><strong>Work:</strong> Pump servicing and pipeline flushing</p>
+                <p class="note"><strong>Note:</strong> Possible water disruption 8 AM - 3 PM</p>
+            </div>
+
+            <div class="maintenance-card">
+                <p><strong>Date:</strong> Oct 12, 2025</p>
+                <p><strong>Location:</strong> Proper, Casay</p>
+                <p><strong>Work:</strong> Pipe replacement and valve installation</p>
+                <p class="note"><strong>Note:</strong> Possible water disruption 8 AM - 4 PM</p>
+            </div>
+        </section>
+
+        <section class="page-section">
+            <h2 class="section-title">Report an Issue</h2>
+            <p class="section-intro">
+                Use this form to report leaks, damaged pipelines, or any water service problem in your area.
+            </p>
+            <form onsubmit="alert('Report Submitted!'); return false;">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+                    <input type="text" id="contactNumber" placeholder="Enter your mobile number" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="e.g., Sitio Mabuhay, Casay" required>
+                </div>
+                <div class="form-group">
+                    <label for="issueDescription">Issue Description</label>
+                    <textarea id="issueDescription" placeholder="Describe the problem..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload photos (optional)</label>
+                    <div class="upload-box">
+                        <label for="fileUpload" class="upload-button">
+                            Camera Icon Choose files
+                        </label>
+                        <input type="file" id="fileUpload" accept="image/*" multiple>
+                        <span class="file-name" id="selectedFileName">No file chosen</span>
+                    </div>
+                </div>
+                <button type="submit" class="submit-button">Submit Report</button>
+            </form>
+
+            >
+
+            <div class="reporting-tips">
+                <h4>Lightbulb Icon Reporting Tips</h4>
+                <ul>
+                    <li>Report visible leaks immediately to reduce water bills.</li>
+                    <li>Always store enough water before scheduled maintenance.</li>
+                    <li>Follow announcements posted on CARWASA's official channels.</li>
+                </ul>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- FULL FOOTER (unchanged) -->
+    <footer class="site-footer-main">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div>
+                    >
+                    <div class="footer-brand-header">
+                        <img src="images/logo.png" alt="CARWASA Logo" class="footer-logo-img">
+                        <h3 class="footer-brand-name">CARWASA</h3>
+                    </div>
+                    <p class="footer-desc">Casay Rural Waterworks and Sanitation Association (CARWASA) is dedicated to providing clean, safe, and reliable water services to the residents of Casay, Dalaguete, Cebu.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon">Instagram Icon</a>
+                        <a href="#" class="social-icon">Facebook Icon</a>
+                        <a href="#" class="social-icon">YouTube Icon</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="footer-title">EXPLORE</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Water Supply & Distribution</a></li>
+                        <li><a href="#">Quality Testing & Monitoring</a></li>
+                        <li><a href="#">Leak Detection & Repair</a></li>
+                        <li><a href="#">New Connection Services</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="footer-title">SERVICES</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Apply for New Connection</a></li>
+                        <li><a href="#">Pay Water Bill</a></li>
+                        <li><a href="#">Request Leak Repair</a></li>
+                        <li><a href="#">Emergency Water Response</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="footer-title">CONTACT US</h3>
+                    <ul class="contact-list">
+                        <li>
+                            Location Icon
+                            <span>Casay, Dalaguete, Cebu</span>
+                        </li>
+                        <li>
+                            Phone Icon
+                            <span>+63 912 345 6789</span>
+                        </li>
+                        <li>
+                            Email Icon
+                            <span>support@carwasa.gov.ph</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-copyright">© 2025 CARWASA | All Rights Reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const burger = document.getElementById('burgerMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeMenu = document.getElementById('closeMenu');
+
+        burger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+        closeMenu.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+        });
+
+        // Sticky header
+        window.addEventListener('scroll', () => {
+            document.querySelector('.site-header').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // File upload display
+        document.getElementById('fileUpload').addEventListener('change', function() {
+            const fileName = this.files.length > 0 
+                ? (this.files.length === 1 ? this.files[0].name : this.files.length + ' files selected')
+                : 'No file chosen';
+            document.getElementById('selectedFileName').textContent = fileName;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CARWASA - Pay Your Bill</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   
+    <style>
+        :root {
+            --color-primary: #135ddc;
+            --color-secondary: #45cade;
+            --color-dark-blue: #021e55;
+            --color-darker-blue: #08245c;
+            --color-white: #ffffff;
+            --color-footer-bg: #08245c;
+            --color-bg: #dbeaf0; /* Main background color, used for the wave fill */
+            --color-alert: #ff6b6b;
+            --color-scheduled: #45cade;
+            --color-success: #28a745; /* Color for successful payments */
+           
+            /* SYNCHRONIZED FONTS */
+            --font-main: 'Poppins', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+       
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+       
+        body {
+            font-family: var(--font-main);
+            background: var(--color-bg);
+            color: var(--color-dark-blue);
+            overflow-x: hidden;
+        }
+       
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+       
+        h1, h2, h3, h4 { font-family: var(--font-heading); }
+        /* CONTAINER - ADDED TO MATCH SECOND CODE */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        /* --- HEADER --- */
+        .site-header {
+            padding: 20px 40px;
+            position: fixed;
+;            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+        }
+        .site-header.scrolled {
+            background: rgba(219, 234, 240, 0.95);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 40px;
+        }
+       
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 8px 20px 8px 30px;
+            height: 68px;
+            max-width: 1300px;
+            margin: 0 auto;
+            transition: all 0.3s ease-in-out;
+        }
+       
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+       
+        .logo-img {
+            width: 42px;
+            height: 58px;
+            object-fit: contain;
+        }
+       
+        .logo-text {
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--color-dark-blue);
+        }
+        .main-nav ul {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+       
+        .main-nav a {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            transition: color 0.3s;
+        }
+       
+        .main-nav a:hover,
+        .main-nav .active-link-style {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+        /* Burger Menu styles (Used as the toggle icon - NO X ANIMATION) */
+        .burger-menu {
+            cursor: pointer;
+            width: 32px;
+            height: 24px;
+            position: relative;
+            z-index: 1001;
+            margin-top: 0;
+        }
+       
+        .burger-menu span {
+            background: var(--color-dark-blue);
+            height: 3.5px;
+            width: 100%;
+            border-radius: 3px;
+            position: absolute;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+       
+        .burger-menu span:nth-child(1) { top: 0; }
+        .burger-menu span:nth-child(2) { top: 10px; }
+        .burger-menu span:nth-child(3) { top: 20px; }
+
+        /* --- NEW PROFILE DROPDOWN STYLES --- */
+        .profile-dropdown {
+            position: absolute;
+            top: 120px;
+            right: 100px;
+            width: 300px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 998;
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            color: var(--color درخواست-dark-blue);
+        }
+       
+        .profile-dropdown.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Dropdown Pointer */
+        .profile-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            background: inherit;
+            transform: rotate(45deg);
+            border-radius: 5px;
+            z-index: -1;
+        }
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            background: linear-gradient(90deg, #3a80e0 0%, #1a71db 100%);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+        .profile-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--color-white);
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .user-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--color-white);
+            letter-spacing: 0.5px;
+        }
+        .dropdown-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            transition: background-color 0.2s, color 0.2s;
+        }
+       
+        .dropdown-links a:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: var(--color-primary);
+        }
+       
+        .dropdown-links a i {
+            margin-right: 15px;
+            font-size: 20px;
+            width: 25px;
+            text-align: center;
+        }
+
+        /* Mobile Menu styles */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 380px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.25);
+            transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 999;
+            padding-top: 100px;
+            overflow-y: auto;
+        }
+       
+        .mobile-menu.active { right: 0; }
+       
+        .mobile-menu-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 25px 30px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+       
+        .close-menu {
+            font-size: 38px;
+            font-weight: 300;
+            cursor: pointer;
+            color: var(--color-dark-blue);
+        }
+       
+        .mobile-nav-links {
+            padding: 30px;
+        }
+       
+        .mobile-nav-links a {
+            display: block;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            margin-bottom: 28px;
+            transition: color 0.3s;
+        }
+       
+        .mobile-nav-links a:hover,
+        .mobile-nav-links .active-link-style {
+            color: var(--color-primary);
+        }
+
+        /* HERO */
+        .page-hero {
+            position: relative;
+            height: 350px;
+            background: linear-gradient(180deg, var(--color-dark-blue) 0%, #00329e 100%);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        .page-hero h1 {
+            position: relative;
+            z-index: 10;
+            font-size: 80px;
+            font-weight: 800;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            letter-spacing: 5px;
+        }
+        .wave-bottom {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            z-index: 2;
+        }
+        .wave-bottom svg { display: block; width: 100%; height: 100%; }
+        .wave-bottom .wave-path { fill: var(--color-bg); }
+
+        .content-wrap { margin-top: -15px; position: relative; z-index: 5; }
+
+        /* Meter & Summary Styles */
+        .meter-title {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--color-dark-blue);
+            margin-bottom: 40px;
+        }
+        .consumption-meter {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+        }
+        .meter-svg { transform: rotate(-90deg); filter: drop-shadow(0 8px 20px rgba(19,93,220,0.2)); }
+        .meter-bg { fill: none; stroke: #e0e0e0; stroke-width: 24; }
+        .meter-progress {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 24;
+            stroke-linecap: round;
+            stroke-dasharray: 628.318;
+            stroke-dashoffset: 628.318;
+            animation: fillMeter 2s ease-out forwards;
+        }
+        @keyframes fillMeter { to { stroke-dashoffset: 421; } }
+        .meter-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .meter-value { font-size: 56px; font-weight: 800; color: var(--color-primary); }
+        .meter-unit { font-size: 20px; font-weight: 600; color: #666; }
+        .meter-label { font-size: 18px; color: #666; margin-bottom: 50px; }
+
+        .summary-card {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 40px;
+            text-align: left;
+            margin: 0 auto;
+        }
+        .summary-header {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-dark-blue);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .summary-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .summary-item strong { display: block; color: #888; font-weight: 600; font-size: 14px; text-transform: uppercase; }
+        .summary-item span { color: var(--color-dark-blue); font-weight: 700; font-size: 18px; }
+        .total-due-wrapper {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(238,90,111,0.3);
+        }
+        .total-due { display: flex; justify-content: space-between; align-items: center; }
+        .total-due-label { font-size: 20px; font-weight: 700; color: white; }
+        .total-due-amount { font-size: 36px; font-weight: 800; color: white; }
+        .pay-button {
+            padding: 18px 60px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 8px 20px rgba(19,93,220,0.3);
+            transition: all 0.3s;
+        }
+        .pay-button:hover {
+            background: var(--color-dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(19,93,220,0.4);
+        }
+
+        /* Footer */
+        .site-footer-main {
+            background: var(--color-footer-bg);
+            color: white;
+            padding: 70px 0 20px;
+            font-size: 15px;
+        }
+        .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.5fr; gap: 40px; margin-bottom: 50px; }
+        .footer-title {
+            font-weight: 700; font-size: 18px; margin-bottom: 25px; padding-bottom: 10px;
+            position: relative;
+        }
+        .footer-title::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 40px; height: 3px;
+            background: var(--color-secondary);
+        }
+        .footer-brand-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .footer-logo-img { width: 50px; height: 50px; object-fit: contain; }
+        .footer-brand-name { font-size: 20px; font-weight: 800; }
+        .footer-desc { color: #dbe4ef; margin-bottom: 20px; font-weight: 300; }
+        .social-links { display: flex; gap: 15px; }
+        .social-icon {
+            width: 30px; height: 30px; background: rgba(255,255,255,0.15);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; transition: 0.3s;
+        }
+        .social-icon:hover { background: var(--color-secondary); }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { color: #dbe4ef; transition: 0.2s; }
+        .contact-list li { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; color: #dbe4ef; }
+        .contact-icon { color: var(--color-secondary); width: 18px; flex-shrink: 0; margin-top: 3px; }
+        .footer-copyright {
+            text-align: center; font-size: 14px; color: #dbe4ef;
+            padding-top: 25px; border-top: 1px solid rgba(69, 202, 222, 0.3);
+        }
+    </style>
+</head>
+<body>
+  <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="CARWASA" class="logo-img" onerror="this.style.display='none'">
+                <span class="logo-text">CARWASA</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li>
+                        <div class="burger-menu" id="burgerMenu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+       
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="dropdown-header">
+                <img src="images/profile.jpg" alt="Profile" class="profile-photo" onerror="this.src='https://via.placeholder.com/60/eeeeee/888888?text=JP'">
+                <span class="user-name">JOHN PAUL TOMAQUIN</span>
+            </div>
+            <div class="dropdown-links">
+                <a href="profile.html">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="payment-history.html">
+                    <i class="fas fa-receipt"></i> Payment History
+                </a>
+                <a href="logout.html">
+                    <i class="fas fa-lock"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <h1>PAY YOUR BILL</h1>
+        <div class="wave-bottom">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path class="wave-path" d="M0,70 C 240,110 480,110 720,70 C 960,30 1200,30 1440,70 L 1440,120 L 0,120 Z"></path>
+            </svg>
+        </div>
+    </section>
+
+    <div class="container content-wrap">
+        <div style="text-align: center; padding: 60px 20px;">
+            <h2 class="meter-title">WATER CONSUMPTION METER</h2>
+
+            <div class="consumption-meter">
+                <svg class="meter-svg" width="280" height="280" viewBox="0 0 280 280">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#135ddc;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#45cade;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="meter-bg" cx="140" cy="140" r="100"/>
+                    <circle class="meter-progress" cx="140" cy="140" r="100"/>
+                </svg>
+                <div class="meter-center">
+                    <div class="meter-value">33</div>
+                    <div class="meter-unit">m³</div>
+                </div>
+            </div>
+
+            <div class="meter-label">Consumption for September 2025</div>
+
+            <div class="summary-card">
+                <div class="summary-header">
+                    Account Summary
+                </div>
+                <div class="summary-details">
+                    <div class="summary-item">
+                        <strong>Account Name</strong>
+                        <span>John Paul Tomaquin</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Account No</strong>
+                        <span>2025-00123</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Billing Period</strong>
+                        <span>Sept 1 - Sept 30, 2025</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Due Date</strong>
+                        <span>Oct 10, 2025</span>
+                    </div>
+                </div>
+
+                <div class="total-due-wrapper">
+                    <div class="total-due">
+                        <span class="total-due-label">Total Due</span>
+                        <span class="total-due-amount">₱380.00</span>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="pay-button">Pay Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer-main">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand-header">
+                        <img src="https://via.placeholder.com/50x50/041230/45cade?text=W" alt="CARWASA Logo" class="footer-logo-img">
+                        <h3 class="footer-brand-name">CARWASA</h3>
+                    </div>
+                    <p class="footer-desc">Casay Rural Waterworks and Sanitation Association (CARWASA) is dedicated to providing clean, safe, and reliable water services to the residents of Casay, Dalaguete, Cebu.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-telegram-plane"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col footer-links">
+                    <h3 class="footer-title">EXPLORE</h3>
+                    <ul>
+                        <li><a href="#">Water Supply & Distribution</a></li>
+                        <li><a href="#">Quality Testing & Monitoring</a></li>
+                        <li><a href="#">Leak Detection & Repair</a></li>
+                        <li><a href="#">New Connection Services</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-links">
+                    <h3 class="footer-title">SERVICES</h3>
+                    <ul>
+                        <li><a href="#">Apply for New Connection</a></li>
+                        <li><a href="#">Pay Water Bill</a></li>
+                        <li><a href="#">Request Leak Repair</a></li>
+                        <li><a href="#">Emergency Water Response</a></li>
+                        <li><a href="#">Report Service Issues</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3 class="footer-title">CONTACT US</h3>
+                    <ul class="contact-list">
+                        <li><i class="fas fa-map-marker-alt contact-icon"></i> <span>Casay, Dalaguete, Cebu, Philippines</span></li>
+                        <li><i class="fas fa-phone-alt contact-icon"></i> <span>+63 912 345 6789</span></li>
+                        <li><i class="fas fa-envelope contact-icon"></i> <span>support@carwasa.gov.ph</span></li>
+                        <li><i class="fas fa-clock contact-icon"></i> <span>Monday - Friday: 8:00 AM - 5:00 PM</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-copyright">© 2025 CARWASA | All Rights Reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        const burgerMenu = document.getElementById('burgerMenu');
+        const profileDropdown = document.getElementById('profileDropdown');
+        burgerMenu.addEventListener('click', (event) => {
+            event.stopPropagation();
+            profileDropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (event) => {
+            if (profileDropdown.classList.contains('active') &&
+                !profileDropdown.contains(event.target) &&
+                !burgerMenu.contains(event.target)) {
+                profileDropdown.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            document.querySelector('.site-header').classList.toggle('scrolled', window.scrollY > 50);
+        });
+        window.addEventListener('scroll', () => {
+            document.querySelector('.site-header').classList.toggle('scrolled', window.scrollY > 50);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARWASA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+
+    <style>
+        :root {
+            --color-primary: #135ddc;
+            --color-secondary: #45cade;
+            --color-dark-blue: #021e55;
+            --color-darker-blue: #08245c;
+            --color-footer-bg: #041230; /* Used for the deep footer background */
+            --color-white: #ffffff;
+            --color-bg: rgba(206, 232, 246, 0.91);
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: var(--font-main); 
+            background-color: var(--color-bg); 
+            color: var(--color-dark-blue); 
+            overflow-x: hidden; 
+        }
+        
+        h1, h2, h3, h4, h5, h6, p, a, span, li { margin: 0; padding: 0; } 
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        /* MODERN FLOATING NAVBAR */
+.site-header {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1260px;
+    padding: 0 30px;
+    z-index: 1000;
+    pointer-events: none;
+    transition: all 0.4s ease;
+}
+.site-header.scrolled { top: 12px; }
+
+.header-container {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 60px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+    padding: 16px 40px;
+    height: 86px;
+    transition: all 0.4s ease;
+}
+.site-header.scrolled .header-container {
+    height: 76px;
+    padding: 12px 40px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.logo { display: flex; align-items: center; gap: 14px; }
+.logo-img { width: 58px; height: 58px; object-fit: contain; }
+.logo-text { font-weight: 900; font-size: 32px; color: var(--color-dark-blue); letter-spacing: -1px; }
+
+.right-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.right-links a,
+.right-links span {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-dark-blue);
+    transition: color 0.3s ease;
+}
+
+.right-links a:hover { color: var(--color-primary); }
+.right-links .active { color: var(--color-primary) !important; font-weight: 800 !important; }
+
+.login-btn {
+    background: var(--color-primary);
+    color: white;
+    font-weight: 700;
+    font-size: 17px;
+    padding: 14px 32px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(19,93,220,.3);
+}
+.login-btn:hover {
+    background: #0d4bb8;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(19,93,220,.4);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .right-links { gap: 20px; }
+    .right-links a, .right-links span { font-size: 16px; }
+    .login-btn { padding: 12px 24px; font-size: 16px; }
+    .header-container { padding: 12px 30px; }
+    .logo-img { width: 48px; height: 48px; }
+    .logo-text { font-size: 26px; }
+}
+
+@media (max-width: 768px) {
+    .header-container { padding: 12px 20px; }
+    .right-links { gap: 15px; }
+    .logo-text { font-size: 24px; }
+}
+
+
+        /* --- Hero --- */
+        .hero-section { position: relative; height: 100vh; min-height: 700px; overflow: hidden; display: flex; align-items: center; }
+        .hero-bg-image, .hero-bg-overlay, .hero-bg-blur { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .hero-bg-image { object-fit: cover; border-radius: 0 0 80px 80px; }
+        .hero-bg-overlay { background: rgba(137,199,244,0.6); border-radius: 0 0 80px 80px; }
+        .hero-bg-blur { background: var(--color-dark-blue); filter: blur(400px); width: 104%; height: 51%; top: 20%; left: -50%; border-radius: 100px; }
+        .hero-content { position: relative; z-index: 2; max-width: 1300px; margin: 0 auto; padding: 0 40px; display: flex; align-items: center; gap: 40px; }
+        .hero-text-content { color: white; max-width: 900px; }
+        .hero-title { font-weight: 800; font-size: 65px; line-height: 1.1; margin-bottom: 30px; margin-left: -100px; }
+        .hero-subtitle { font-size: 30px; margin-bottom: 40px; margin-left: -100px; font-weight: 500; }
+        .btn-pay-bill { background: var(--color-primary); color: white; padding: 15px 40px; border-radius: 50px; font-weight: 700; font-size: 20px; display: inline-block; margin-left: -100px; cursor: pointer; transition: background 0.3s; }
+        .btn-pay-bill:hover { background: var(--color-darker-blue); }
+        .hero-visuals img { margin-right: -100px; width: 550px; height: auto; }
+
+        /* --- Water Interruptions --- */
+        .interruptions-section { padding: 80px 40px; max-width: 2000px; margin: 0 auto; }
+        .interruptions-card {
+            background: var(--color-secondary); border-radius: 30px; padding: 40px; display: flex; align-items: center; gap: 50px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .water-drop-icon { width: 150px; height: 150px; object-fit: contain; } 
+        .interruptions-title { font-weight: 800; font-size: 50px; color: var(--color-dark-blue); margin-bottom: 12px; } 
+        .interruptions-desc { font-size: 30px; margin-bottom: 20px; }
+        .interruptions-link { font-weight: 700; font-size: 30px; display: inline-flex; align-items: center; gap: 10px; color: var(--color-dark-blue); transition: gap 0.3s; }
+        .interruptions-link svg { transition: transform 0.3s; }
+        .interruptions-link:hover { gap: 15px; color: var(--color-primary); }
+        .interruptions-link:hover svg { transform: translateX(5px); }
+        
+        /* --- News Section --- */
+        .news-section {
+            background: var(--color-darker-blue); 
+            padding: 80px 40px;
+            margin: 0 40px 80px;
+            border-radius: 50px;
+            color: white;
+        }
+        .news-container { max-width: 1200px; margin: 0 auto; }
+        .news-section-title {
+            font-weight: 800;
+            font-size: 55px; 
+            color: var(--color-secondary);
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .news-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+        .featured-news {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            color: var(--color-darker-blue);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .featured-news img {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+        }
+        .featured-news-caption {
+            padding: 25px;
+            font-weight: 700;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        .wave { display: block; width: 100%; height: 60px; }
+        .news-list-container {
+            background: white;
+            border-radius: 15px;
+            max-height: 520px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .news-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+            color: var(--color-darker-blue);
+        }
+        .news-list::-webkit-scrollbar { width: 8px; }
+        .news-list::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 10px; }
+        .news-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .news-list::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+        .news-item {
+            display: flex;
+            background: white;
+            margin: 0 20px 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+	    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* This adds a soft shadow */
+            }
+        .news-item:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .news-date {
+            background: var(--color-dark-blue);
+            color: white;
+            width: 90px;
+            flex-shrink: 0;
+            text-align: center;
+            padding: 15px 0;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .news-date .day { font-size: 32px; line-height: 1; }
+        .news-date .month { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .news-title {
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.4;
+            color: var(--color-darker-blue);
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- Awards Section (NEW) --- */
+        .awards-section {
+            background: linear-gradient(180deg, var(--color-dark-blue) 0%, var(--color-darker-blue) 100%);
+            padding: 80px 40px;
+            color: white;
+            margin-bottom: 80px;
+        }
+        .awards-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .awards-section-title {
+            font-weight: 800;
+            font-size: 55px;
+            color: var(--color-secondary);
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .award-card {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1); /* Slightly transparent white for the background */
+            border-left: 8px solid var(--color-secondary);
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, background 0.3s;
+        }
+        .award-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .award-icon-wrapper {
+            width: 80px;
+            height: 50px;
+            flex-shrink: 0;
+            margin-right: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        /* Assuming 'trophy-icon.png' is a white or transparent image for filtering */
+        .award-icon-wrapper img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        .award-title {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--color-secondary);
+            margin-bottom: 5px;
+        }
+        .award-recognition {
+            font-size: 16px;
+            color: #dbe4ef;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        /* --- Staff Section (NEW) --- */
+        .staff-section {
+            background: var(--color-dark-blue);
+            padding: 80px 40px;
+            color: white;
+	    margin-bottom: 80px;
+        }
+        .staff-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .staff-section-title {
+            font-weight: 800;
+            font-size: 55px;
+            color: var(--color-secondary);
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .staff-grid {
+           display: grid; /* CHANGE from flex to grid */
+    	   grid-template-columns: repeat(4, 1fr); /* SET TO 4 EQUAL COLUMNS */
+           justify-content: center; /* Remove this as grid handles alignment */
+           gap: 30px;
+	   padding-left: 120px;
+        }
+        .staff-member {
+            text-align: center;
+            width: 150px; /* Fixed width for consistent alignment */
+        }
+        .staff-photo-wrapper {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid var(--color-secondary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .staff-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .staff-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            margin-bottom: 3px;
+        }
+        .staff-position {
+            font-size: 14px;
+            color: var(--color-secondary);
+            font-weight: 500;
+        }
+
+        /* --- FOOTER CSS (FIXED) --- */
+        .site-footer-main { 
+            background: var(--color-darker-blue); /* Use darker blue for consistency with the last version */
+            color: white; 
+            padding: 60px 40px 30px; 
+        }
+        .footer-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        .footer-grid { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1fr 1fr; 
+            gap: 40px; 
+            margin-bottom: 40px; 
+        }
+        .footer-col p, .footer-col ul { 
+            font-size: 15px; 
+            line-height: 1.6; 
+            color: #dbe4ef; /* Lighter color for readability */
+        }
+        .footer-title { 
+            font-weight: 700; 
+            font-size: 18px; 
+            margin-bottom: 15px; 
+            padding-bottom: 8px; 
+            color: var(--color-secondary); 
+            text-transform: uppercase;
+        }
+
+        /* Footer Column 1: Brand */
+        .footer-brand-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .footer-logo-img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        .footer-brand-name {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+        .footer-desc {
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            font-size: 18px; 
+            color: var(--color-secondary); 
+            transition: color 0.3s;
+        }
+        .social-links a:hover { 
+            color: var(--color-white); 
+        }
+
+        /* Footer Columns 2 & 3: Links */
+        .footer-col ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .footer-col ul li { 
+            margin-bottom: 10px; 
+        }
+        .footer-col a { 
+            transition: color 0.3s, padding-left 0.3s; 
+            color: #dbe4ef;
+        }
+        .footer-col a:hover { 
+            color: var(--color-secondary); 
+            padding-left: 5px;
+        }
+        
+        /* Footer Column 4: Contact */
+        .contact-list li { 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 10px; 
+            margin-bottom: 10px; 
+            color: #dbe4ef;
+        }
+        .contact-icon { 
+            margin-top: 3px; 
+            color: var(--color-secondary); 
+            width: 16px; /* Sizing icons for consistency */
+            flex-shrink: 0;
+        }
+
+        .footer-copyright { 
+            text-align: center; 
+            font-size: 14px; 
+            color: rgba(255,255,255,0.5); 
+            padding-top: 20px; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+        }
+        
+        /* --- Popup Modal Styles (FIXED) --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 1000;
+            justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 25px; text-align: center;
+            max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: scale(0.8); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-icon { 
+            font-size: 50px; 
+            margin-bottom: 15px; 
+            color: var(--color-primary); /* Style the icon */
+        }
+        .modal-title { 
+            font-size: 24px; 
+            font-weight: 800; 
+            color: var(--color-dark-blue); 
+            margin-bottom: 10px; 
+        }
+        .modal-text { 
+            font-size: 16px; /* Adjusted size for better fit */
+            color: #555; 
+            margin-bottom: 25px; 
+            line-height: 1.5;
+        }
+        .modal-btn {
+            background: var(--color-primary); color: white; border: none; padding: 12px 30px;
+            border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; transition: background 0.3s;
+        }
+        .modal-btn:hover { background: var(--color-dark-blue); }
+
+
+        /* --- RESPONSIVE MEDIA QUERIES (IMPROVED) --- */
+        @media (max-width: 1200px) {
+            .hero-title { font-size: 55px; margin-left: 0; }
+            .hero-subtitle { font-size: 24px; margin-left: 0; }
+            .btn-pay-bill { font-size: 18px; margin-left: 0; }
+            .hero-visuals img { width: 450px; margin-right: 0; }
+            .hero-content { padding: 0 20px; }
+        }
+
+        @media (max-width: 992px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+            .news-grid { grid-template-columns: 1fr; }
+            .featured-news img { height: 300px; }
+            .site-header { padding: 10px 20px; }
+            .main-nav { display: none; } 
+            .btn-login { padding: 8px 20px; font-size: 14px; }
+            .header-container { height: 50px; padding: 8px 15px; }
+            .logo-text { font-size: 18px; }
+        }
+
+        @media (max-width: 768px) {
+            .site-header { padding: 10px 0; }
+            /* Footer switches to single column on mobile */
+            .footer-grid { grid-template-columns: 1fr; }
+            .hero-section { height: auto; min-height: 500px; padding-bottom: 80px; }
+            
+            .hero-content { flex-direction: column; text-align: center; padding-top: 80px; }
+            .hero-text-content, .hero-visuals { width: 100%; max-width: 100%; }
+            .hero-title { font-size: 38px; line-height: 1.3; margin-bottom: 20px; }
+            .hero-subtitle { font-size: 20px; margin-bottom: 30px; }
+            .hero-visuals img { width: 80%; max-width: 300px; margin-top: 30px; }
+            .btn-pay-bill { font-size: 16px; padding: 12px 30px; }
+
+            .interruptions-section { padding: 40px 20px; }
+            .interruptions-card { flex-direction: column; text-align: center; gap: 20px; padding: 30px; }
+            .interruptions-title { font-size: 28px; }
+            .interruptions-desc { font-size: 16px; }
+
+            .news-section { margin: 0 10px 40px; padding: 40px 15px; border-radius: 30px; }
+            .news-section-title { font-size: 38px; margin-bottom: 30px; }
+            .featured-news img { height: 250px; }
+            .news-list-container { max-height: 400px; }
+            .news-item { margin: 0 10px 10px; }
+            .news-title { font-size: 14px; padding: 15px; }
+            .news-date .day { font-size: 28px; }
+            .news-date { width: 70px; }
+
+            /* Responsive Adjustments for new sections */
+            .awards-section { padding: 40px 10px; margin-bottom: 40px; }
+            .awards-section-title, .staff-section-title { font-size: 38px; margin-bottom: 30px; }
+            .staff-section { padding: 40px 10px; }
+            .award-card { flex-direction: column; text-align: center; border-left: none; border-top: 8px solid var(--color-secondary); padding: 20px; }
+            .award-icon-wrapper { margin: 0 0 15px 0; }
+            .staff-member { width: 45%; max-width: 180px; }
+            .staff-photo-wrapper { width: 120px; height: 120px; }
+        }
+        @media (max-width: 480px) {
+            .staff-grid {
+        grid-template-columns: 1fr; /* Change to 1 column on phones */
+    }
+    .staff-member { width: 100%; max-width: 250px; }
+    .staff-photo-wrapper { width: 150px; height: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header" id="header">
+    <div class="header-container">
+        <a href="index.html" class="logo">
+            <img src="images/logo.png" alt="CARWASA" class="logo-img">
+            <span class="logo-text">CARWASA</span>
+        </a>
+
+        <div class="right-links">
+            <a href="services.html">Services</span>
+            <a href="about.html">About</a>
+            <a href="login.php" class="login-btn">Log in / Sign up</a>
+        </div>
+    </div>
+</header>
+
+
+    <section class="hero-section">
+        <img src="images/background.jpg" alt="" class="hero-bg-image">
+        <div class="hero-bg-overlay"></div>
+        <div class="hero-bg-blur"></div>
+        <div class="hero-content">
+            <div class="hero-text-content">
+                <h1 class="hero-title">CASAY RURAL WATERWORKS AND SANITATION ASSOCIATION INC.</h1>
+                <p class="hero-subtitle">Safe. Reliable. Accessible Water for Every Household</p>
+                <a href="#" id="payBillBtn" class="btn-pay-bill">Pay your Bill</a>
+            </div>
+            <div class="hero-visuals">
+                <img src="images/water.png" alt="Water Drop">
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="interruptions-section">
+        <div class="interruptions-card">
+            <div class="interruptions-icon-wrapper">
+                <img src="images/wrench.png" alt="Drop" class="water-drop-icon"> 
+            </div>
+            <div class="interruptions-text">
+                <h2 class="interruptions-title">WATER INTERRUPTIONS</h2>
+                <p class="interruptions-desc">View updates on scheduled and emergency water service interruptions</p>
+                <a href="waterinterup.html" class="interruptions-link">
+                    Learn More
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="news" class="news-section">
+        <div class="news-container">
+            <h2 class="news-section-title">NEWS</h2>
+            <div class="news-grid">
+                <div class="featured-news">
+                    <img src="images/meeting.jpg" alt="Community">
+                    <p class="featured-news-caption">CARWASA Secures Funding for Future Expansion Projects in Barangay Casay</p>
+                    <svg class="wave" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 90L60 75C120 60 240 30 360 22.5C480 15 600 30 720 52.5C840 75 960 105 1080 112.5C1200 120 1320 105 1380 97.5L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V90Z" fill="#45cade"/>
+                    </svg>
+                </div>
+                <div class="news-list-container">
+                    <div class="news-list">
+                        <div class="news-item">
+                            <div class="news-date"><div class="day">28</div><div class="month">Sep</div></div>
+                            <div class="news-title">CARWASA Expands Safe Water Access to More Households in Barangay Casay</div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-date"><div class="day">15</div><div class="month">Sep</div></div>
+                            <div class="news-title">Dalaguete Community Benefits from Upgraded Water Distribution Lines by CARWASA</div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-date"><div class="day">2</div><div class="month">Sep</div></div>
+                            <div class="news-title">CARWASA Launches Sanitation Awareness Campaign in Barangay Casay</div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-date"><div class="day">18</div><div class="month">Aug</div></div>
+                            <div class="news-title">Mandatory Water Rationing Advisory Due to Dry Season - Read Details</div>
+                        </div>
+                          <div class="news-item">
+                            <div class="news-date"><div class="day">5</div><div class="month">Aug</div></div>
+                            <div class="news-title">New Billing System Launch: Register Online for Paperless Statements</div>
+                        </div>
+                          <div class="news-item">
+                            <div class="news-date"><div class="day">1</div><div class="month">Aug</div></div>
+                            <div class="news-title">CARWASA Public Consultation on Proposed Water Tariff Adjustments</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="awards" class="awards-section">
+        <div class="awards-container">
+            <h2 class="awards-section-title">AWARDS, RECOGNITIONS, & CERTIFICATIONS</h2>
+            <div class="awards-list">
+                <div class="award-card">
+                    <div class="award-icon-wrapper">
+                        <img src="images/1.png" alt="Trophy Icon">
+                    </div>
+                    <div>
+                        <p class="award-title">Best Rural Water Service Provider</p>
+                        <p class="award-recognition">Recognized by the Dalaguete Municipal Council in 2022 for excellence in community water management.</p>
+                    </div>
+                </div>
+                <div class="award-card">
+                    <div class="award-icon-wrapper">
+                        <img src="images/2.png" alt="Trophy Icon">
+                    </div>
+                    <div>
+                        <p class="award-title">Sanitation Excellence Award</p>
+                        <p class="award-recognition">Awarded by the Department of Health for promoting safe and sanitary water systems in rural areas.</p>
+                    </div>
+                </div>
+                <div class="award-card">
+                    <div class="award-icon-wrapper">
+                        <img src="images/3.png" alt="Trophy Icon">
+                    </div>
+                    <div>
+                        <p class="award-title">ISO 9001:2023 Certified</p>
+                        <p class="award-recognition">Certified for implementing international quality management standards in service operations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="staff" class="staff-section">
+        <div class="staff-container">
+            <h2 class="staff-section-title">CARWASA OFFICIALS & STAFF</h2>
+            <div class="staff-grid">
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/maria.jpg" alt="Engr. Maria Dela Cruz" class="staff-photo">
+                    </div>
+                    <p class="staff-name">Engr. Maria Dela Cruz</p>
+                    <p class="staff-position">Chairperson</p>
+                </div>
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/jose.png" alt="Jose Ramirez" class="staff-photo">
+                    </div>
+                    <p class="staff-name">Jose Ramirez</p>
+                    <p class="staff-position">Vice Chairperson</p>
+                </div>
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/john.jpg" alt="John Lopez" class="staff-photo">
+                    </div>
+                    <p class="staff-name">John Lopez</p>
+                    <p class="staff-position">Treasurer</p>
+                </div>
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/rico.jpg" alt="Rico Fernandez" class="staff-photo">
+                    </div>
+                    <p class="staff-name">Rico Fernandez</p>
+                    <p class="staff-position">Secretary</p>
+                </div>
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/arnel.jpg" alt="Arnel Paglinawan" class="staff-photo">
+                    </div>
+                    <p class="staff-name">Arnel Paglinawan</p>
+                    <p class="staff-position">Water Technician</p>
+                </div>
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/elaine.jpg" alt="Ellaine Sombilon" class="staff-photo">
+                    </div>
+                    <p class="staff-name">Ellaine Sombilon</p>
+                    <p class="staff-position">Customer Service Staff</p>
+                </div>
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/daniella.jpg" alt="Daniella Reposar" class="staff-photo">
+                    </div>
+                    <p class="staff-name">Daniella Reposar</p>
+                    <p class="staff-position">Maintenance Staff</p>
+                </div>
+                <div class="staff-member">
+                    <div class="staff-photo-wrapper">
+                        <img src="images/lea.jpg" alt="Lea Gonzales" class="staff-photo">
+                    </div>
+                    <p class="staff-name">Lea Gonzales</p>
+                    <p class="staff-position">Auditor</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer-main">
+        <div class="footer-container">
+            <div class="footer-grid">
+                
+                <div class="footer-col">
+                    <div class="footer-brand-header">
+                        <h3 class="footer-title">CARWASA</h3>
+                    </div>
+                    <p class="footer-desc">Casay Rural Waterworks and Sanitation Association (CARWASA) is dedicated to providing clean, safe, and reliable water services to the residents of Casay, Dalaguete, Cebu.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3 class="footer-title">EXPLORE</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Water Supply & Distribution</a></li>
+                        <li><a href="#">Quality Testing & Monitoring</a></li>
+                        <li><a href="#">Leak Detection & Repair</a></li>
+                        <li><a href="#">New Connection Services</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3 class="footer-title">SERVICES</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Apply for New Connection</a></li>
+                        <li><a href="#" id="payBillFooter">Pay Water Bill</a></li>
+                        <li><a href="#">Request Leak Repair</a></li>
+                        <li><a href="#">Emergency Water Response</a></li>
+                        <li><a href="#">Report Service Issues</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3 class="footer-title">CONTACT US</h3>
+                    <ul class="contact-list">
+                        <li>
+                            <i class="fas fa-map-marker-alt contact-icon"></i>
+                            <span>Casay, Dalaguete, Cebu, Philippines</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone contact-icon"></i>
+                            <span>+63 912 345 6789</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope contact-icon"></i>
+                            <span>support@carwasa.gov.ph</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-clock contact-icon"></i>
+                            <span>Monday - Friday: 8:00 AM - 5:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            <div class="footer-copyright">© 2025 CARWASA | All Rights Reserved.</div>
+        </div>
+    </footer>
+
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon"><i class="fas fa-lock"></i></div>
+            <h3 class="modal-title">Login Required</h3>
+            <p class="modal-text">You need to login first to pay your bill.</p>
+            <button class="modal-btn" id="closeModalBtn">Okay, Close</button>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('scroll', () => {
+        document.getElementById('header').classList.toggle('scrolled', window.scrollY > 80);
+    });
+
+
+        // POPUP MODAL LOGIC
+        const payBillBtn = document.getElementById('payBillBtn');
+        const payBillFooter = document.getElementById('payBillFooter');
+        const modal = document.getElementById('loginModal');
+        const closeBtn = document.getElementById('closeModalBtn');
+
+        function openModal(e) {
+            e.preventDefault();
+            modal.classList.add('active');
+        }
+
+        if(payBillBtn) payBillBtn.addEventListener('click', openModal);
+        if(payBillFooter) payBillFooter.addEventListener('click', openModal);
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1031 @@
+<?php
+// --- PHP Initialization and Session Check ---
+session_start();
+
+// --- 2. Initialize variables with default guest values ---
+$is_logged_in = isset($_SESSION['user_id']);
+$full_name = "Guest";
+$initials = "G";
+$user_id = $_SESSION['user_id'] ?? null;
+$first_name = "Guest";
+$last_name = "";
+
+// =========================================================================
+// ✅ MODIFICATION: Rely ONLY on Session Data if logged in
+// We assume the login script correctly populated $_SESSION['first_name'] and $_SESSION['last_name']
+// =========================================================================
+if ($is_logged_in && $user_id !== null) {
+    
+    // Check if name details are in the session (this should always be true after a successful login)
+    if (isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) {
+        $first_name = $_SESSION['first_name'];
+        $last_name = $_SESSION['last_name'];
+    } else {
+        // Fallback for a stale session (user_id exists but names were lost)
+        $first_name = "Session";
+        $last_name = "Missing";
+    }
+
+    // 3. Set the display variables using the session data
+    $full_name = strtoupper($first_name . ' ' . $last_name);
+    // Ensure initials are calculated correctly even if a name part is empty
+    $initials = strtoupper(
+        substr($first_name, 0, 1) . 
+        (isset($last_name) ? substr($last_name, 0, 1) : '')
+    );
+}
+
+// Variables $user_id, $full_name, $initials, and $is_logged_in are now ready for the HTML template.
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARWASA - Pay Your Bill</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --color-primary: #135ddc;
+            --color-secondary: #45cade;
+            --color-dark-blue: #021e55;
+            --color-darker-blue: #08245c;
+            --color-white: #ffffff;
+            --color-footer-bg: #08245c; 
+            --color-bg: #dbeaf0; 
+            
+            /* SYNCHRONIZED FONTS */
+            --font-main: 'Poppins', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+        
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body { 
+            font-family: var(--font-main); 
+            background: var(--color-bg); 
+            color: var(--color-dark-blue); 
+            overflow-x: hidden; 
+        }
+        
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        
+        h1, h2, h3, h4 { font-family: var(--font-heading); }
+
+        /* --- HEADER --- */
+        .site-header {
+            padding: 20px 40px;
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            /* FIX: Ensure the non-scrolled header is slightly transparent */
+            
+        }
+
+        /* SCROLLED TRANSITION: This makes the top header bar shrink and gain a full white background */
+        .site-header.scrolled { 
+            background: rgba(219, 234, 240, 0.95); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 40px; 
+        }
+        
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 8px 20px 8px 30px;
+            height: 68px; /* Consistent size */
+            max-width: 1300px;
+            margin: 0 auto;
+            transition: all 0.3s ease-in-out; 
+        }
+
+        /* FIX: Ensure the header container pill remains consistent in size and appearance when scrolled. */
+        .site-header.scrolled .header-container {
+            /* Keep its original background and shadow */
+            padding: 8px 20px 8px 30px; 
+            height: 68px; 
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-img { 
+            width: 42px; 
+            height: 58px; 
+            object-fit: contain; 
+        }
+        
+        .logo-text { 
+            font-weight: 800; 
+            font-size: 22px; 
+            color: var(--color-dark-blue); 
+        }
+
+        /* Navigation */
+        .main-nav ul {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .main-nav a {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-dark-blue); 
+            transition: color 0.3s;
+        }
+        
+        .main-nav a:hover,
+        .main-nav .active-link-style {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .nav-menu-image-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-menu-image {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            transition: opacity 0.3s;
+        }
+
+        .nav-menu-image-link:hover .nav-menu-image {
+            opacity: 0.7;
+        }
+
+        /* Burger Menu styles (Used as the toggle icon - NO X ANIMATION) */
+        .burger-menu {
+            cursor: pointer;
+            width: 32px;
+            height: 24px;
+            position: relative;
+            z-index: 1001;
+            margin-top: 0; 
+        }
+        
+        .burger-menu span {
+            background: var(--color-dark-blue);
+            height: 3.5px;
+            width: 100%;
+            border-radius: 3px;
+            position: absolute;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .burger-menu span:nth-child(1) { top: 0; }
+        .burger-menu span:nth-child(2) { top: 10px; }
+        .burger-menu span:nth-child(3) { top: 20px; }
+
+        /* REMOVED: Burger Menu Animation (The 'X' State) */
+        /*
+        .burger-menu.active span:nth-child(1) {
+            transform: translateY(10px) rotate(45deg);
+        }
+        .burger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .burger-menu.active span:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg);
+        }
+        */
+        
+        /* --- NEW PROFILE DROPDOWN STYLES --- */
+        .profile-dropdown {
+            position: absolute;
+            top: 120px; 
+            right: 100px; 
+            width: 300px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 998;
+            transform: translateY(-10px); 
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            color: var(--color-dark-blue); 
+        }
+        
+        .profile-dropdown.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Dropdown Pointer (The little bubble top-right) */
+        .profile-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -20px; 
+            right: 15px; 
+            width: 30px;
+            height: 30px;
+            background: inherit; 
+            transform: rotate(45deg);
+            border-radius: 5px;
+            z-index: -1; 
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            background: linear-gradient(90deg, #3a80e0 0%, #1a71db 100%); 
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .profile-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white; 
+            border: 0px solid var(--color-white);
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--color-white); 
+            letter-spacing: 0.5px;
+        }
+
+        .dropdown-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            transition: background-color 0.2s, color 0.2s;
+        }
+        
+        .dropdown-links a:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: var(--color-primary);
+        }
+        
+        .dropdown-links a i {
+            margin-right: 15px;
+            font-size: 20px;
+            width: 25px; 
+            text-align: center;
+        }
+        /* End NEW PROFILE DROPDOWN STYLES */
+
+        /* Mobile Menu styles (unchanged) */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 380px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.25);
+            transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 999;
+            padding-top: 100px;
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.active { right: 0; }
+        
+        .mobile-menu-header {
+            position: absolute;
+            top: 0; 
+            left: 0; 
+            right: 0;
+            padding: 25px 30px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-menu {
+            font-size: 38px;
+            font-weight: 300;
+            cursor: pointer;
+            color: var(--color-dark-blue);
+        }
+        
+        .mobile-nav-links {
+            padding: 30px;
+        }
+        
+        .mobile-nav-links a {
+            display: block;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-dark-blue);
+            margin-bottom: 28px;
+            transition: color 0.3s;
+        }
+        
+        .mobile-nav-links a:hover {
+            color: var(--color-primary);
+        }
+
+        /* --- HERO SECTION WITH WAVE --- */
+        .page-hero {
+            position: relative;
+            min-height: 350px;
+            background: linear-gradient(180deg, var(--color-dark-blue) 0%, #00329e 100%);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding-top: 50px; 
+            margin-bottom: 0; 
+        }
+        .page-hero h1 {
+            position: relative;
+            z-index: 10;
+            font-family: var(--font-heading); 
+            font-size: 85px;
+            font-weight: 900;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            letter-spacing: 12px; 
+            margin-bottom: 60px; 
+        }
+          
+        /* Wave SVG Styling */
+        .wave-bottom {
+            position: absolute;
+            bottom: -1px; 
+            left: 0;
+            width: 100%;
+            height: 150px; 
+            z-index: 10;
+        }
+        .wave-bottom svg {
+            display: block;
+            width: 100%;
+            height: 130%;
+        }
+        .wave-bottom .wave-path {
+            fill: var(--color-bg); 
+        }
+          
+        .content-wrap {
+            margin-top: -50px; 
+            position: relative;
+            z-index: 5;
+        }
+
+        /* MAIN CONTENT */
+        .main-container {
+            padding-top: 0; 
+            min-height: 100vh;
+        }
+
+        /* Content Area */
+        .content-area {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Meter Display */
+        .meter-title {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--color-dark-blue);
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+            font-family: var(--font-heading);
+        }
+
+        .consumption-meter {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin-bottom: 30px;
+        }
+
+        .meter-svg {
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 8px 20px rgba(19, 93, 220, 0.2));
+        }
+
+        .meter-bg {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-width: 24;
+        }
+
+        .meter-progress {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 24;
+            stroke-linecap: round;
+            /* Circumference of r=100 is 2*PI*100 approx 628.318 */
+            stroke-dasharray: 628.318;
+            /* Initial state: fully offset */
+            stroke-dashoffset: 628.318;
+            animation: fillMeter 2s ease-out forwards;
+        }
+        /* Custom Keyframe for 33m³ consumption (approx 33% fill) */
+        @keyframes fillMeter {
+            to {
+                stroke-dashoffset: 421; /* (1 - 0.33) * 628.318 */
+            }
+        }
+
+
+        .meter-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .meter-value {
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--color-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+            font-family: var(--font-heading);
+        }
+
+        .meter-unit {
+            font-size: 20px;
+            font-weight: 600;
+            color: #666;
+            font-family: var(--font-heading);
+        }
+
+        .meter-label {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 50px;
+            font-weight: 500;
+        }
+
+        /* Account Summary Card */
+        .summary-card {
+            width: 100%;
+            max-width: 700px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            padding: 40px;
+            text-align: left;
+        }
+        
+        .summary-header {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-dark-blue);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.5px;
+            font-family: var(--font-heading);
+        }
+
+        .summary-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-item {
+            font-size: 16px;
+        }
+        
+        .summary-item strong {
+            display: block;
+            color: #888;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-item span {
+            color: var(--color-dark-blue);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .total-due-wrapper {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(238, 90, 111, 0.3);
+        }
+
+        .total-due {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-due-label {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .total-due-amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            font-family: var(--font-heading);
+        }
+        
+        .pay-button-container {
+            text-align: center;
+        }
+        
+        .pay-button {
+            padding: 18px 60px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 8px 20px rgba(19, 93, 220, 0.3);
+            transition: all 0.3s;
+            font-family: var(--font-heading); 
+            letter-spacing: 1px;
+        }
+
+        .pay-button:hover {
+            background: var(--color-dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(19, 93, 220, 0.4);
+        }
+
+        /* FOOTER styles (unchanged) */
+        .site-footer-main {
+            background: var(--color-footer-bg);
+            color: white;
+            padding: 70px 40px 20px;
+            font-size: 15px;
+        }
+        
+        .footer-container { 
+            max-width: 1300px; 
+            margin: 0 auto; 
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr 1fr 1.3fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-title {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            position: relative;
+            text-transform: uppercase;
+            font-family: var(--font-heading); 
+        }
+        
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--color-secondary);
+        }
+        
+        .footer-brand-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        
+        .footer-logo-img {
+            width: 55px; 
+            height: 55px; 
+            border-radius: 50%; 
+            background: white; 
+            border: 2px solid var(--color-secondary);
+            object-fit: contain; 
+            padding: 5px;
+        }
+        
+        .footer-brand-name { 
+            font-size: 24px; 
+            font-weight: 800; 
+            letter-spacing: 1px; 
+            font-family: var(--font-heading);
+        }
+        
+        .footer-desc { 
+            line-height: 1.6; 
+            color: #dbe4ef; 
+            margin-bottom: 25px; 
+            font-weight: 400; 
+        }
+        
+        .social-links { 
+            display: flex; 
+            gap: 15px; 
+        }
+        
+        .social-icon {
+            width: 35px; 
+            height: 35px; 
+            background: rgba(255,255,255,0.15); 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.3s; 
+            color: var(--color-secondary);
+        }
+        
+        .social-icon:hover { 
+            background: var(--color-secondary); 
+            color: var(--color-footer-bg); 
+        }
+        
+        .footer-links li { 
+            margin-bottom: 15px; 
+        }
+        
+        .footer-links a { 
+            color: #dbe4ef; 
+            font-weight: 400; 
+            transition: 0.2s; 
+        }
+        
+        .footer-links a:hover { 
+            color: var(--color-secondary); 
+            padding-left: 5px; 
+        }
+        
+        .contact-list li {
+            display: flex; 
+            align-items: flex-start; 
+            gap: 15px; 
+            margin-bottom: 18px; 
+            color: #dbe4ef;
+        }
+        
+        .contact-icon { 
+            color: var(--color-secondary); 
+            width: 20px; 
+            flex-shrink: 0; 
+            margin-top: 2px; 
+        }
+        
+        .footer-copyright {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #dbe4ef;
+            padding-top: 25px;
+            border-top: 1px solid rgba(69, 202, 222, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .main-nav ul { display: none; }
+            .burger-menu { display: block; }
+            .footer-grid { 
+                grid-template-columns: 1fr 1fr; 
+                gap: 30px; 
+            }
+            .summary-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .page-hero h1 { 
+                font-size: 45px; 
+                letter-spacing: 5px;
+            }
+            .content-area { padding: 30px 20px 60px; }
+            .meter-title {
+                font-size: 32px;
+            }
+            .consumption-meter {
+                width: 220px;
+                height: 220px;
+            }
+            .meter-value {
+                font-size: 42px;
+            }
+            .summary-card {
+                padding: 30px 25px;
+            }
+            .summary-header {
+                font-size: 26px;
+            }
+            .total-due-amount {
+                font-size: 28px;
+            }
+            .footer-grid { 
+                grid-template-columns: 1fr; 
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+     <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="CARWASA" class="logo-img" onerror="this.style.display='none'">
+                <span class="logo-text">CARWASA</span>
+            </a>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li>
+                        <div class="burger-menu" id="burgerMenu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="dropdown-header">
+                <img src="images/profile.jpg" alt="Profile" class="profile-photo" onerror="this.src='https://via.placeholder.com/60/eeeeee/888888?text=<?php echo $initials; ?>'">
+                <span class="user-name"><?php echo $full_name; ?></span>
+            </div>
+            <div class="dropdown-links">
+                <a href="profile.php">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="payment-history.html">
+                    <i class="fas fa-receipt"></i> Payment History
+                </a>
+                <a href="index.html">
+                    <i class="fas fa-lock"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+    </header>
+
+
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="logo-text">CARWASA</div>
+            <div class="close-menu" id="closeMenu">×</div>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="services.html">Services</a>
+            <a href="about.html">About</a>
+            <a href="#news">News</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <section class="page-hero">
+            <h1 class="banner-title">PAY YOUR BILL</h1>
+            <div class="wave-bottom">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 150" preserveAspectRatio="none">
+                    <path class="wave-path" d="M0,70 C 240,110 480,100 720,70 C 960,40 1200,40 1440,70 L 1440,150 L 0,150 Z"></path>
+                </svg>
+            </div>
+        </section>
+        
+        <div class="content-wrap">
+            <div class="content-area">
+                <div class="meter-title">WATER CONSUMPTION METER</div>
+                
+                <div class="consumption-meter">
+                    <svg class="meter-svg" width="280" height="280" viewBox="0 0 280 280">
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#135ddc;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#45cade;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="meter-bg" cx="140" cy="140" r="100"/>
+                        <circle class="meter-progress" cx="140" cy="140" r="100"/>
+                    </svg>
+                    <div class="meter-center">
+                        <div class="meter-value">33</div>
+                        <div class="meter-unit">m³</div>
+                    </div>
+                </div>
+                
+                <div class="meter-label">Consumption for September 2025</div>
+                
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        Account Summary
+                    </div>
+                    <div class="summary-details">
+                        <div class="summary-item">
+                            <strong>Account Name</strong>
+                            <span>John Paul Tomaquin</span>
+                        </div>
+                        <div class="summary-item">
+                            <strong>Account No</strong>
+                            <span>2025-00123</span>
+                        </div>
+                        <div class="summary-item">
+                            <strong>Billing Period</strong>
+                            <span>Sept 1 - Sept 30, 2025</span>
+                        </div>
+                        <div class="summary-item">
+                            <strong>Due Date</strong>
+                            <span>Oct 10, 2025</span>
+                        </div>
+                    </div>
+                    
+                    <div class="total-due-wrapper">
+                        <div class="total-due">
+                            <span class="total-due-label">Total Due</span>
+                            <span class="total-due-amount">₱380.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pay-button-container">
+                        <button class="pay-button">Pay Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer-main">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand-header">
+                        
+                        <h3 class="footer-title">CARWASA</h3>
+                    </div>
+                    <p class="footer-desc">Casay Rural Waterworks and Sanitation Association (CARWASA) is dedicated to providing clean, safe, and reliable water services to the residents of Casay, Dalaguete, Cebu.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="20" rx="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"/>
+                                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3 class="footer-title">EXPLORE</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Water Supply & Distribution</a></li>
+                        <li><a href="#">Quality Testing & Monitoring</a></li>
+                        <li><a href="#">Leak Detection & Repair</a></li>
+                        <li><a href="#">New Connection Services</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3 class="footer-title">SERVICES</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Apply for New Connection</a></li>
+                        <li><a href="#">Pay Water Bill</a></li>
+                        <li><a href="#">Request Leak Repair</a></li>
+                        <li><a href="#">Emergency Water Response</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3 class="footer-title">CONTACT US</h3>
+                    <ul class="contact-list">
+                        <li>
+                            <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span>Casay, Dalaguete, Cebu</span>
+                        </li>
+                        <li>
+                            <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                            <span>+63 912 345 6789</span>
+                        </li>
+                        <li>
+                            <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                            <span>support@carwasa.gov.ph</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-copyright">© 2025 CARWASA | All Rights Reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        const burgerMenu = document.getElementById('burgerMenu');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        burgerMenu.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+            profileDropdown.classList.toggle('active');
+            // Removed: burgerMenu.classList.toggle('active'); so it doesn't change to 'X'
+        });
+
+        // Close dropdown when clicking outside of it
+        document.addEventListener('click', (event) => {
+            if (profileDropdown.classList.contains('active') && 
+                !profileDropdown.contains(event.target) && 
+                !burgerMenu.contains(event.target)) {
+                
+                profileDropdown.classList.remove('active');
+                // Removed: burgerMenu.classList.remove('active'); so it doesn't try to revert to burger from X
+            }
+        });
+
+        
+        // Sticky Header Script (Synchronized)
+        window.addEventListener('scroll', () => {
+            document.querySelector('.site-header').classList.toggle('scrolled', window.scrollY > 50);
+        });
+    </script>
+</body>
+</html>

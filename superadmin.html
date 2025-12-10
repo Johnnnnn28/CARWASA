@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - CARWASA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f8fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #003d82 0%, #001f4d 100%);
+            color: white;
+            padding: 24px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        .header-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .header h1 { font-size: 26px; font-weight: 600; }
+        .header p { font-size: 15px; opacity: 0.9; margin-top: 4px; }
+
+        .container { max-width: 1300px; margin: 40px auto; padding: 0 20px; }
+
+        .tabs {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+        }
+        .tabs-header::-webkit-scrollbar { display: none; }
+
+        .tab-button {
+            flex: none;
+            min-width: 180px;
+            padding: 20px 16px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            position: relative;
+        }
+        .tab-button:hover { background: #f8fafc; color: #003d82; }
+        .tab-button.active {
+            color: #003d82;
+            font-weight: 600;
+            background: #f0f7ff;
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: #003d82;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .tab-content { padding: 40px; display: none; }
+        .tab-content.active { display: block; }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #003d82;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        .card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .card-title { font-size: 18px; font-weight: 600; }
+        .card-subtitle { font-size: 14px; color: #666; margin-top: 4px; }
+
+        .detail {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+        }
+        .detail i { color: #003d82; width: 20px; }
+
+        .actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14.5px;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: #003d82; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-view { background: #007bff; color: white; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+        .btn:hover { transform: translateY(-2px); }
+
+        .badge {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-safe { background: #d4edda; color: #155724; }
+        .badge-published { background: #d1ecf1; color: #0c5460; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #003d82;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+        }
+        textarea { min-height: 150px; resize: vertical; }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #003d82;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .tabs-header { flex-direction: column; }
+            .tab-button { min-width: 100%; }
+            .actions, .modal-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-content">
+        <img src="images/logo.png"CARWASA Logo" style="width:44px;height:44px;border-radius:12px;object-fit:cover;">
+        <div>
+            <h1>Super Admin Dashboard</h1>
+            <p>CARWASA</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="tabs">
+        <div class="tabs-header">
+            <button class="tab-button" onclick="switchTab('meter')">Water Meter Validation</button>
+            <button class="tab-button active" onclick="switchTab('connection')">Water Connection Request</button>
+            <button class="tab-button" onclick="switchTab('disconnection')">Water Disconnection</button>
+            <button class="tab-button" onclick="switchTab('interruptions')">Water Interruptions</button>
+            <button class="tab-button" onclick="switchTab('quality')">Water Quality</button>
+            <button class="tab-button" onclick="switchTab('news')">News Article</button>
+        </div>
+
+        <!-- 1. Water Meter Validation -->
+        <div class="tab-content" id="meter-content">
+            <h2 class="section-title">Water Meter Validation Requests</h2>
+            <div class="card">
+                <div class="card-title">Maria Santos</div>
+                <div class="card-subtitle">Meter ID: WM2024-005678</div>
+                <div class="detail"><i class="fas fa-phone"></i> <strong>Phone:</strong> 0917-555-1234</div>
+                <div class="detail"><i class="fas fa-map-marker-alt"></i> Brgy. Mabolo, Cebu City</div>
+                <div class="actions">
+                    <button class="btn btn-success">Approve</button>
+                    <button class="btn btn-danger" onclick="openDenyModal('Maria Santos')">Deny</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Water Connection Request (ACTIVE) -->
+        <div class="tab-content active" id="connection-content">
+            <h2 class="section-title">New Water Connection Requests</h2>
+            <div class="card">
+                <div class="card-title">Pedro Garcia</div>
+                <div class="card-subtitle">Residential • Brgy. Kasambagan</div>
+                <div class="detail"><i class="fas fa-phone"></i> 0934-567-8901</div>
+                <div class="actions">
+                    <button class="btn btn-view">View Documents</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Water Disconnection -->
+        <div class="tab-content" id="disconnection-content">
+            <h2 class="section-title">Water Disconnection Requests</h2>
+            <div class="card">
+                <div class="card-title">Linda Fernandez</div>
+                <div class="card-subtitle">Water Meter ID: WM2024-055667</div>
+                <div class="detail"><i class="fas fa-exclamation-triangle"></i> Reason: Property Sold</div>
+                <div class="actions">
+                    <button class="btn btn-view">View Document</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Water Interruptions -->
+        <div class="tab-content" id="interruptions-content">
+            <div class="section-title">
+                <span>Water Interruptions (Emergency/Scheduled)</span>
+                <button class="btn btn-primary" onclick="openModal('interruptionsModal')">
+                    + Schedule Interruption
+                </button>
+            </div>
+
+            <!-- Sample Interruption 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Scheduled Maintenance</div>
+                        <div class="card-subtitle">December 5, 2025 • 8:00 AM – 5:00 PM</div>
+                        <p style="margin-top:8px;">Affected: Brgy. Casay Proper, Sitio Riverside</p>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-warning btn-sm" onclick="editInterruption(1)">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="if(confirm('Delete this interruption?')) alert('Deleted!')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sample Interruption 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Emergency Repair</div>
+                        <div class="card-subtitle">November 28, 2025 • Ongoing</div>
+                        <p style="margin-top:8px;">Affected: Brgy. Lahug</p>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-warning btn-sm" onclick="editInterruption(2)">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="if(confirm('Delete this interruption?')) alert('Deleted!')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Water Quality -->
+        <div class="tab-content" id="quality-content">
+            <div class="section-title">
+                <span>Water Quality Reports</span>
+                <button class="btn btn-primary" onclick="openModal('qualityModal')">
+                    + Upload Report
+                </button>
+            </div>
+            <div class="card" style="text-align:center;padding:40px;">
+                <p>Latest Report: November 25, 2025 – <strong style="color:#28a745;">SAFE</strong></p>
+            </div>
+        </div>
+
+        <!-- 6. News Article -->
+        <div class="tab-content" id="news-content">
+            <div class="section-title">
+                <span>News & Announcements</span>
+                <button class="btn btn-primary" onclick="openModal('newsModal')">
+                    + New Article
+                </button>
+            </div>
+
+            <!-- Sample News 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">New Billing System Launching January 2026</div>
+                        <div class="card-subtitle">Published on Nov 26, 2025</div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-warning btn-sm" onclick="editNews(1)">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="if(confirm('Delete this article?')) alert('Article deleted!')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                <p>Customers will enjoy real-time billing and multiple payment options...</p>
+                <span class="badge badge-published">Published</span>
+            </div>
+
+            <!-- Sample News 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Holiday Schedule Announcement</div>
+                        <div class="card-subtitle">Draft – Nov 25, 2025</div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-warning btn-sm" onclick="editNews(2)">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="if(confirm('Delete this article?')) alert('Article deleted!')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                <p>Office will be closed on December 24–25 and January 1...</p>
+                <span class="badge" style="background:#f8d7da;color:#721c24;">Draft</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deny Modal -->
+<div class="modal" id="denyModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Deny Request</h3>
+            <button class="close-btn" onclick="closeModal('denyModal')">&times;</button>
+        </div>
+        <p>Denying request for: <strong id="denyName"></strong></p>
+        <div class="form-group">
+            <label>Reason for Denial *</label>
+            <textarea id="denyReason" placeholder="Explain why this request is denied..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" style="background:#6c757d;color:white;" onclick="closeModal('denyModal')">Cancel</button>
+            <button class="btn btn-danger" onclick="alert('Request denied!')">Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Water Interruptions Modal -->
+<div class="modal" id="interruptionsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Schedule Water Interruption</h3>
+            <button class="close-btn" onclick="closeModal('interruptionsModal')">&times;</button>
+        </div>
+        <form>
+            <div class="form-group"><label>Date & Time</label><input type="datetime-local"></div>
+            <div class="form-group"><label>Affected Areas</label><textarea placeholder="List barangays or areas..."></textarea></div>
+            <div class="form-group"><label>Reason</label><textarea placeholder="Pipeline repair, maintenance, etc."></textarea></div>
+            <div class="modal-actions">
+                <button type="button" class="btn" style="background:#6c757d;color:white;" onclick="closeModal('interruptionsModal')">Cancel</button>
+                <button type="submit" class="btn btn-success">Schedule</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Water Quality Modal -->
+<div class="modal" id="qualityModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Upload Water Quality Report</h3>
+            <button class="close-btn" onclick="closeModal('qualityModal')">&times;</button>
+        </div>
+        <form>
+            <div class="form-group"><label>Test Date</label><input type="date"></div>
+            <div class="form-group"><label>Upload PDF Report</label><input type="file" accept=".pdf"></div>
+            <div class="form-group"><label>Status</label>
+                <select><option>SAFE FOR DRINKING</option><option>NOT SAFE</option></select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn" style="background:#6c757d;color:white;" onclick="closeModal('qualityModal')">Cancel</button>
+                <button type="submit" class="btn btn-success">Upload Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- News Article Modal -->
+<div class="modal" id="newsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Create News Article</h3>
+            <button class="close-btn" onclick="closeModal('newsModal')">&times;</button>
+        </div>
+        <form>
+            <div class="form-group"><label>Title</label><input type="text" placeholder="Enter article title"></div>
+            <div class="form-group"><label>Content</label><textarea placeholder="Write your announcement..."></textarea></div>
+            <div class="form-group"><label>Status</label>
+                <select><option>Published</option><option>Draft</option></select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn" style="background:#6c757d;color:white;" onclick="closeModal('newsModal')">Cancel</button>
+                <button type="submit" class="btn btn-success">Publish Article</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.getElementById(id + '-content').classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function openDenyModal(name) {
+        document.getElementById('denyName').textContent = name;
+        openModal('denyModal');
+    }
+
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    function editInterruption(id) {
+        alert('Edit Interruption ID: ' + id + ' (Open modal with pre-filled data here)');
+        openModal('interruptionsModal');
+    }
+
+    function editNews(id) {
+        alert('Edit News ID: ' + id + ' (Open modal with pre-filled data here)');
+        openModal('newsModal');
+    }
+
+    window.onclick = function(e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.classList.remove('active');
+        }
+    }
+</script>
+</body>
+</html>

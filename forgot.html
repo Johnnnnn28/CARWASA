@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CARWASA - Forgot Password</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- VARIABLES & BASE STYLES --- */
+    :root {
+      --color-primary: #135ddc;
+      --color-dark-blue: #021e55;
+      --color-bg-light: #d1eff7; 
+      --color-border: #e1e4e8;
+      --font-main: 'Outfit', sans-serif;
+      /* DCWD/Inspo Icon Colors */
+      --color-active-icon: #004d99; /* Darker blue */
+      --color-inactive-icon: #cccccc; /* Light gray */
+      --color-completed-icon: #1ed123; /* Green */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
+
+    body {
+      min-height: 100vh;
+      width: 100%;
+      background-color: #f0f4f8; /* Light gray background */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color:  #f0f4f8; 
+        z-index: 0;
+    }
+
+    /* Back Button */
+    .btn-back {
+      position: absolute;
+      top: 30px; left: 30px;
+      background: var(--color-primary);
+      color: white;
+      text-decoration: none;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 10px rgba(19, 93, 220, 0.3);
+      transition: transform 0.2s, background 0.2s;
+      z-index: 10;
+    }
+    .btn-back:hover { transform: translateX(-3px); background: var(--color-dark-blue); }
+
+    /* Main Card */
+    .fp-card {
+      background: white;
+      width: 800px; /* Smaller width for focused task */
+      max-width: 95%;
+      border-radius: 10px; 
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px 50px;
+      position: relative;
+      overflow: hidden;
+      min-height: 500px; 
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      z-index: 1;
+    }
+
+    /* Header Section - Logo and Title */
+    .header-section { text-align: center; margin-bottom: 30px; }
+    .logo-img { width: 70px; margin-bottom: 10px; }
+    .main-logo-text {
+        font-size: 26px; font-weight: 700; color: var(--color-dark-blue);
+        margin-top: 0; margin-bottom: 5px;
+    }
+    .page-title { 
+        font-size: 22px; font-weight: 700; color: #333; 
+        margin-top: 0; margin-bottom: 5px; 
+    }
+    .description-text {
+        font-size: 15px; color: #666; margin-bottom: 20px;
+    }
+
+    /* --- STEPPER STYLES (INSPRED BY DCWD) --- */
+    .stepper-wrapper {
+      display: flex; justify-content: space-between; 
+      margin-bottom: 50px; position: relative;
+      max-width: 90%; margin: 0 auto 50px;
+      width: 100%; 
+    }
+    .step-item {
+      position: relative; display: flex; flex-direction: column;
+      align-items: center; flex-basis: 33.33%; z-index: 2;
+      text-align: center; padding: 0;
+    }
+    .step-circle {
+      width: 45px; height: 45px; border-radius: 50%;
+      background: var(--color-inactive-icon); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 20px; margin-bottom: 10px;
+      transition: all 0.3s;
+    }
+    
+    .step-circle svg {
+        width: 20px; height: 20px;
+        stroke: white; fill: white; transition: all 0.3s;
+    }
+
+    .step-text { 
+        font-size: 13px; font-weight: 400; color: #999; 
+        text-transform: uppercase; letter-spacing: 0.5px; 
+        line-height: 1.2;
+    }
+    
+    /* Active/Completed Styles */
+    .step-item.active .step-circle { 
+        background: var(--color-active-icon); 
+        box-shadow: 0 0 0 5px rgba(0, 77, 153, 0.2); 
+    }
+    .step-item.active .step-text { 
+        color: var(--color-dark-blue); font-weight: 600; 
+    }
+    .step-item.completed .step-circle { 
+        background: var(--color-completed-icon); /* Green for completion */
+        box-shadow: none;
+    }
+    .step-item.completed .step-text { 
+        color: var(--color-dark-blue); font-weight: 600;
+    }
+
+    /* Connector Line */
+    .progress-line {
+      position: absolute; top: 22px; left: calc(45px / 2); right: calc(45px / 2); 
+      height: 2px; background: #e0e0e0; z-index: 1;
+    }
+    .progress-fill {
+      height: 100%; background: var(--color-primary); width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* --- STEP CONTENT --- */
+    .step-content { display: none; animation: fadeIn 0.4s ease; max-width: 450px; margin: 0 auto; width: 100%; } 
+    .step-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .step-header-text { text-align: center; margin-bottom: 30px; }
+    .step-header-text h3 { color: var(--color-dark-blue); font-size: 20px; margin-bottom: 5px; }
+    .step-header-text p { color: #555; font-size: 15px; line-height: 1.4; }
+
+    /* Form Styles */
+    .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .input-group label { font-size: 15px; font-weight: 600; color: #444; }
+    .form-input {
+      padding: 15px 15px; 
+      border: 1px solid var(--color-border);
+      border-radius: 5px; 
+      font-size: 16px; 
+      outline: none; transition: 0.3s;
+      width: 100%;
+    }
+    .form-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(19, 93, 220, 0.1); }
+    
+    /* OTP Specifics */
+    .otp-input-group { 
+        display: flex; justify-content: space-between; gap: 10px; 
+        margin-bottom: 20px; 
+    }
+    .otp-input { 
+        width: 60px; height: 60px; text-align: center; font-size: 24px; 
+        font-weight: 700; border: 2px solid var(--color-border); border-radius: 8px;
+    }
+    .resend-link { text-align: right; margin-top: -10px; margin-bottom: 20px;}
+    .resend-link a { color: var(--color-primary); text-decoration: none; font-weight: 600; font-size: 14px; }
+
+    /* Buttons */
+    .btn-action {
+      width: 100%; background: var(--color-primary); color: white;
+      border: none; padding: 16px; 
+      border-radius: 5px;
+      font-size: 17px; 
+      font-weight: 700; cursor: pointer;
+      transition: background 0.2s; margin-top: 10px;
+      letter-spacing: 1px;
+    }
+    .btn-action:hover { background: var(--color-dark-blue); }
+
+    /* Success Page */
+    .success-container { text-align: center; padding: 20px 0; }
+    .success-box {
+      background: #e8f4fc; border: 2px solid var(--color-primary);
+      padding: 40px; border-radius: 15px; margin-bottom: 30px;
+    }
+    .success-title { font-size: 24px; font-weight: 800; color: var(--color-dark-blue); margin-bottom: 10px; }
+    .success-icon svg { stroke: #27ae60; width: 60px; height: 60px; margin-bottom: 15px; }
+
+
+    /* Login Link */
+    .login-link { text-align: center; margin-top: 25px; font-size: 15px; color: #666; }
+    .login-link a { color: var(--color-primary); font-weight: 700; text-decoration: none; }
+
+    .copyright { 
+        position: fixed; bottom: 10px; left: 0; right: 0;
+        text-align: center; font-size: 14px; color: #f0f0f0; 
+        z-index: 1;
+    }
+
+  </style>
+</head>
+<body>
+
+  <a href="login.html" class="btn-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    Back to Login
+  </a>
+
+  <div class="fp-card">
+    
+    <div class="header-section">
+      <img src="images/logo.png" alt="CARWASA" class="logo-img">
+      <h3 class="main-logo-text">CARWASA</h3>
+      <h2 class="page-title">Forgot Password</h2>
+      <p class="description-text">Recover access to your CARWASA Online Services account.</p>
+    </div>
+
+    <div class="stepper-wrapper">
+      <div class="progress-line"><div class="progress-fill" id="progressFill"></div></div>
+      
+      <div class="step-item active" id="stepIndicator1">
+        <div class="step-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="step-text">Account Identification</div>
+      </div>
+      
+      <div class="step-item" id="stepIndicator2">
+        <div class="step-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.55 13.55 17 19l4-4"/><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.01-7.01C12.58 6.77 15.29 1 17.86 2.15l.49-.49a2 2 0 0 1 2.83 2.83l-.49.49C22.9 9.1 17.23 11.83 14.39 12.39z"/></svg>
+        </div>
+        <div class="step-text">OTP Validation</div>
+      </div>
+      
+      <div class="step-item" id="stepIndicator3">
+        <div class="step-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="step-text">New Password</div>
+      </div>
+    </div>
+
+    <div id="step1" class="step-content active">
+      <form onsubmit="goToStep2(event)">
+        <div class="step-header-text">
+            <h3>Account Identification</h3>
+            <p>Please enter the **Email Address** associated with your account to receive a One-Time Password (OTP).</p>
+        </div>
+        
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="ex. juan@gmail.com" required>
+        </div>
+
+        <button type="submit" class="btn-action">NEXT</button>
+      </form>
+      <div class="login-link">Remembered your password? <a href="login.html">Login</a></div>
+    </div>
+
+    <div id="step2" class="step-content">
+      <div class="step-header-text">
+        <h3>OTP Validation</h3>
+        <p>Your OTP has been sent to **juan@gmail.com**.<br>Please enter the 6-digit code below to verify.</p>
+      </div>
+
+      <form onsubmit="goToStep3(event)">
+        <div class="otp-input-group">
+            <input type="text" class="otp-input" maxlength="1" required>
+            <input type="text" class="otp-input" maxlength="1" required>
+            <input type="text" class="otp-input" maxlength="1" required>
+            <input type="text" class="otp-input" maxlength="1" required>
+            <input type="text" class="otp-input" maxlength="1" required>
+            <input type="text" class="otp-input" maxlength="1" required>
+        </div>
+        <div class="resend-link">
+            <a href="#" onclick="alert('OTP Resent!')">Resend OTP</a>
+        </div>
+        <button type="submit" class="btn-action">VALIDATE CODE</button>
+      </form>
+    </div>
+
+    <div id="step3" class="step-content">
+      <form onsubmit="goToStep4(event)">
+        <div class="step-header-text">
+            <h3>Create New Password</h3>
+            <p>Your OTP was successfully verified. Please set a strong, new password.</p>
+        </div>
+
+        <div class="input-group">
+          <label for="new-pass">New Password</label>
+          <input type="password" id="new-pass" class="form-input" placeholder="Enter new password" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="confirm-pass">Confirm Password</label>
+          <input type="password" id="confirm-pass" class="form-input" placeholder="Repeat new password" required>
+        </div>
+
+        <button type="submit" class="btn-action">SET PASSWORD</button>
+      </form>
+    </div>
+
+    <div id="step4" class="step-content">
+      <div class="success-container">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h2 class="success-title">Password Successfully Updated!</h2>
+        <p style="color: #444; margin-bottom: 30px;">You can now use your new password to log in to your account.</p>
+
+        <button onclick="window.location.href='login.html'" class="btn-action">GO TO LOGIN</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="copyright">© 2025 CARWASA. All Rights Reserved.</div>
+
+  <script>
+    // Elements
+    const stepContents = [
+        document.getElementById('step1'),
+        document.getElementById('step2'),
+        document.getElementById('step3'),
+        document.getElementById('step4')
+    ];
+    const indicators = [
+        document.getElementById('stepIndicator1'),
+        document.getElementById('stepIndicator2'),
+        document.getElementById('stepIndicator3')
+    ];
+    const fill = document.getElementById('progressFill');
+    let currentStep = 1;
+
+    function updateStepper() {
+        indicators.forEach((ind, index) => {
+            ind.classList.remove('active', 'completed');
+            if (index + 1 < currentStep) {
+                ind.classList.add('completed');
+            } else if (index + 1 === currentStep) {
+                ind.classList.add('active');
+            }
+        });
+
+        // Set progress line fill percentage
+        if (currentStep === 1) fill.style.width = "0%";
+        if (currentStep === 2) fill.style.width = "50%";
+        if (currentStep === 3 || currentStep === 4) fill.style.width = "100%";
+
+        // Show/hide content
+        stepContents.forEach((content, index) => {
+            content.classList.remove('active');
+            if (index + 1 === currentStep) {
+                content.classList.add('active');
+            } else if (currentStep === 4 && index === 3) {
+                // Special case: show step 4 content when currentStep is 4
+                content.classList.add('active');
+            }
+        });
+    }
+
+    function goToStep2(e) {
+        e.preventDefault();
+        currentStep = 2;
+        updateStepper();
+    }
+
+    function goToStep3(e) {
+        e.preventDefault();
+        currentStep = 3;
+        updateStepper();
+    }
+    
+    function goToStep4(e) {
+        e.preventDefault();
+        // Simulate API call/validation delay before showing success
+        // In a real application, you'd handle password update here
+        
+        currentStep = 4;
+        updateStepper();
+    }
+
+    // Auto-focus and move between OTP inputs
+    document.querySelectorAll('.otp-input-group input').forEach((input, index, inputs) => {
+        input.addEventListener('input', (e) => {
+            if (e.data && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            } else if (e.inputType === 'deleteContentBackward' && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+    });
+
+    // Initialize the first step
+    updateStepper();
+  </script>
+
+</body>
+</html>
